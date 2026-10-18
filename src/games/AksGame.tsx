@@ -10,6 +10,7 @@ import { GAMES, type Lang } from '@/types';
 import { t } from '@/utils/i18n';
 import { unlockAudio, playDing, playPop, playWhistle } from '@/utils/egyptianAudioEngine';
 import { speak } from '@/utils/speech';
+import { ACTION_ARTWORK } from '@/brand';
 
 interface Props {
   onExit: () => void;
@@ -185,13 +186,14 @@ export function AksGame({ onExit }: Props) {
               transition={{ type: 'spring', stiffness: 200, damping: 20 }}
             >
               <div
-                className="w-64 h-72 rounded-3xl shadow-pop flex flex-col items-center justify-center"
+                className="action-card rounded-3xl shadow-pop flex flex-col items-center justify-center overflow-hidden"
                 style={{ backgroundColor: COLOR_META[card.color].hex }}
               >
-                <span className="text-white text-5xl font-black mb-3">
+                <img src={ACTION_ARTWORK[card.word]} alt="" aria-hidden="true" width="1122" height="1402" className="action-artwork" decoding="async" />
+                <span className="text-white text-4xl font-black mt-4 mb-3">
                   {lang === 'ar' ? WORD_META[card.word].ar : WORD_META[card.word].en}
                 </span>
-                <span className="text-white/70 text-sm font-bold">
+                <span className="text-white text-sm font-bold px-3 pb-4 text-center">
                   {t(lang, 'your_answer')}
                 </span>
               </div>

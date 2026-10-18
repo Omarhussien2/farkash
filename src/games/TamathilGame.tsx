@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, type ReactNode } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Play, Square, Check } from 'lucide-react';
 import { GameArtwork } from '@/components/BrandArtwork';
@@ -16,13 +16,8 @@ import {
   playDing,
 } from '@/utils/egyptianAudioEngine';
 import { speak } from '@/utils/speech';
-import {
-  SphinxPose,
-  JuiceSellerPose,
-  HeronPose,
-  RamsesPose,
-  NileBoatPose,
-} from '@/components/Illustrations';
+import { HeronPose, NileBoatPose } from '@/components/Illustrations';
+import { POSE_ARTWORK } from '@/brand';
 
 interface Props {
   onExit: () => void;
@@ -35,7 +30,7 @@ interface Pose {
   arName: string;
   enName: string;
   color: string;
-  Illustration: React.FC<{ className?: string }>;
+  artwork: ReactNode;
 }
 
 const POSES: Pose[] = [
@@ -44,35 +39,35 @@ const POSES: Pose[] = [
     arName: 'اثبت زي أبو الهول',
     enName: 'Freeze like the Sphinx',
     color: '#FFC107',
-    Illustration: SphinxPose,
+    artwork: <img src={POSE_ARTWORK.sphinx} alt="" width="1122" height="1402" className="pose-artwork" decoding="async" />,
   },
   {
     key: 'juice',
     arName: 'اثبت زي بياع العرقسوس',
     enName: 'Freeze like the juice seller',
     color: '#D84315',
-    Illustration: JuiceSellerPose,
+    artwork: <img src={POSE_ARTWORK.juice} alt="" width="1122" height="1402" className="pose-artwork" decoding="async" />,
   },
   {
     key: 'heron',
     arName: 'اقف على رجل واحدة زي مالك الحزين',
     enName: 'Stand on one leg like the heron',
     color: '#1E88E5',
-    Illustration: HeronPose,
+    artwork: <HeronPose className="pose-artwork" />,
   },
   {
     key: 'ramses',
     arName: 'اثبت زي تمثال رمسيس',
     enName: 'Freeze like Ramses statue',
     color: '#FFB300',
-    Illustration: RamsesPose,
+    artwork: <img src={POSE_ARTWORK.ramses} alt="" width="1122" height="1402" className="pose-artwork" decoding="async" />,
   },
   {
     key: 'boat',
     arName: 'اثبت زي المركب في النيل',
     enName: 'Freeze like a Nile boat',
     color: '#26A69A',
-    Illustration: NileBoatPose,
+    artwork: <NileBoatPose className="pose-artwork" />,
   },
 ];
 
@@ -257,9 +252,10 @@ export function TamathilGame({ onExit }: Props) {
               initial={{ scale: 0.4, rotate: -10 }}
               animate={{ scale: 1, rotate: 0 }}
               transition={{ type: 'spring', stiffness: 200, damping: 14 }}
-              className="relative z-10 mb-4"
+              className="relative z-10 mb-4 w-full flex justify-center"
+              aria-hidden="true"
             >
-              <currentPose.Illustration className="w-56 h-48 drop-shadow-lg" />
+              {currentPose.artwork}
             </motion.div>
             <motion.h2
               className="relative z-10 text-3xl font-black text-nile-800 text-center mb-2"

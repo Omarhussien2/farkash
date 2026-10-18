@@ -111,6 +111,9 @@ button, a { scroll-margin-block: 24px 120px; }
 .game-illustration { display: flex; align-items: center; justify-content: center; background: #fff9ec; height: 260px; width: 100%; padding: 0; }
 .game-artwork { width: 100%; height: 100%; object-fit: contain; }
 .setup-artwork { display: block; width: min(100%, 260px); height: 260px; margin: 16px auto; border-radius: 24px; }
+.pose-artwork { display: block; width: min(100%, 300px); height: clamp(180px, 38dvh, 320px); object-fit: contain; border-radius: 24px; }
+.action-card { width: min(100%, 320px); border: 4px solid transparent; }
+.action-artwork { display: block; width: 100%; height: clamp(160px, 30dvh, 240px); object-fit: contain; background: var(--brand-paper); }
 .brand-sticker { display: inline-block; flex-shrink: 0; width: 44px; height: 44px; background-repeat: no-repeat; }
 .sticker-star { background-size: 787.7% auto; background-position: 3.9% 7%; }
 .sticker-rainbow { background-size: 682.7% auto; background-position: 96.1% 0.6%; }

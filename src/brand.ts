@@ -13,3 +13,14 @@ export const GAME_ARTWORK: Record<GameId, string> = {
   sabr: '/images/Patience%20Timer%20&%20Color%20Trap.jpg',
   nafas: '/images/Turtle%20Breathing.jpg',
 };
+
+export const POSE_ARTWORK = {
+  sphinx: '/images/Reclining%20Egyptian%20Sphinx%20in%20Star%20Sunglasses.png',
+  juice: '/images/Egyptian%20licorice%20vendor%20pouring%20a%20drink.png',
+  ramses: '/images/Ramesses%20II%20Freeze%20Pose.png',
+};
+
+export const ACTION_ARTWORK = {
+  run: '/images/Speedy%20dual-faced%20cube%20mascot.png',
+  freeze: '/images/Cube%20Mascot%20Freezes%20Mid-Stop.png',
+};
