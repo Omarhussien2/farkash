@@ -1,0 +1,10 @@
+.env
+.env.*
+node_modules
+dist
+.bolt
+.qoder-shots
+supabase
+tests
+vitest.config.ts
+REVIEW.md
