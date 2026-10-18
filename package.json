@@ -7,7 +7,10 @@
     "node": "24.x"
   },
   "scripts": {
+    "library": "node scripts/build-library.mjs",
+    "predev": "npm run library",
     "dev": "vite",
+    "prebuild": "npm run library",
     "build": "vite build",
     "lint": "eslint .",
     "preview": "vite preview",
@@ -25,6 +28,7 @@
     "@eslint/js": "^9.9.1",
     "@tailwindcss/postcss": "^4.3.3",
     "@testing-library/react": "^16.3.0",
+    "@types/node": "^24.19.2",
     "@types/react": "^18.3.5",
     "@types/react-dom": "^18.3.0",
     "@vitejs/plugin-react": "^4.7.0",

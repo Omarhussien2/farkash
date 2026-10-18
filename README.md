@@ -61,14 +61,24 @@
 
 ## تقرير البطل
 
-يجمع التقرير عدد الجلسات، ومتوسط أزمنة الاستجابة المسجلة، وثواني الانتظار أو الثبات، والأخطاء، ودرجات كل لعبة. ويعرض توزيع النتائج على أيام الأسبوع.
+يعرض التقرير محاولات اللعب الحقيقي خلال آخر سبعة أيام، وأيام الممارسة، والثواني المسجّلة للانتظار والهدوء، مع اقتراح عملي للمحاولة القادمة وزر لفتح اللعبة المناسبة.
 
 - أزمنة ألعاب الحركة تعتمد على **لمسة تأكيد اللاعب**؛ لا يستخدم التطبيق كاميرا أو مستشعرًا لقياس الحركة.
-- جلسات التنفس لا تدخل في متوسط سرعة الاستجابة.
-- مؤشر التحكم في الاندفاع يُحسب من أخطاء جلسات اللعب وفق قاعدة التطبيق؛ يعكس أداء اللعبة.
-- عند الاستخدام الأول، تظهر **بيانات تجريبية موضَّحة داخل التقرير** إلى جانب أي جلسات جديدة. الأرقام التجريبية ليست نتائج أطفال أو دليلًا على فعالية علاجية.
+- بعد اكتمال **٦ محاولات حقيقية في اللعبة نفسها**، يقارن أول ثلاث بآخر ثلاث عبر السجل كله: متوسط النتيجة من ١٠٠ ومتوسط الأخطاء لكل محاولة. المجموعتان منفصلتان، ولا تُقارن درجات ألعاب مختلفة.
+- حدّ المقارنة شرط حسابي لتكوين مجموعتين، وليس معيارًا طبيًا. تغيير إعدادات اللعبة أو المساعدة أو ظروف اللعب قد يؤثر في النتائج.
+- التنفس يُسجّل كنشاط مكتمل؛ نتيجته لا تقيس هدوء الطفل أو حالته النفسية.
+- **البيانات التجريبية منفصلة** في عرض اختياري؛ لا تدخل في إحصاءات اللعب الحقيقي أو المقارنات الشخصية.
+- السجل موحّد على الجهاز، ولا توجد ملفات منفصلة للأطفال. مشاركة الجهاز أو اللعب الجماعي يدمج النتائج؛ لا يمكن نسبتها لطفل واحد.
 
 فركش مصمم لدعم التدريب من خلال اللعب. لا توجد في هذا المستودع دراسة سريرية تقيس أثره العلاجي.
+
+## مكتبة أولياء الأمور
+
+تضم [المكتبة](https://farkash.vercel.app/articles/) أربعة أدلة عربية عن العصبية، والاندفاع، والصبر وانتظار الدور، والتركيز والاستماع. كل دليل يتضمن أنشطة منزلية وأسئلة شائعة وروابط للمصادر ولعبة مرتبطة بالموضوع. الخلفية العامة تستند إلى مصادر من الأكاديمية الأمريكية لطب الأطفال، وCDC، ومركز نمو الطفل بجامعة هارفارد؛ لا يعني ذلك اعتماد هذه الجهات للتطبيق.
+
+المقالات صفحات HTML مستقلة تُقرأ بدون JavaScript، مع عناوين وأوصاف فريدة، وروابط أساسية `canonical`، وبيانات منظمة `Article` و`FAQPage` و`BreadcrumbList`، وروابط داخلية، وملفّي `sitemap.xml` و`robots.txt`. تهيئة الفهرسة لا تضمن ترتيبًا معينًا أو ظهور نتائج بحث محسّنة.
+
+المحتوى محفوظ في `src/content/articles.json`. يولّد `scripts/build-library.mjs` الصفحات تلقائيًا قبل `npm run dev` و`npm run build`، ويمكن تشغيله مباشرة بأمر `npm run library`. المخرجات داخل `public/articles/` وملفّا خريطة الموقع والروبوتات مولّدة ولا تُحفظ في Git. عند تعديل المحتوى أثناء تشغيل خادم التطوير، أعد تشغيل `npm run library` لتحديث الصفحات.
 
 ## تجربة مناسبة للاستخدام اليومي
 
@@ -191,6 +201,6 @@ supabase/migrations/20261018190000_lock_unauthenticated_sessions.sql
 
 ### English overview
 
-**Farkash** is an Arabic/English web app with six Egyptian-themed games for practising attention, waiting, response inhibition, movement, and paced breathing. It uses a familiar mobile screen to guide play with a parent or educator. Play history stays in the current browser; the progress report labels its sample data. Built with React, TypeScript, Vite, and Tailwind CSS, with PWA support and regression tests.
+**Farkash** is an Arabic/English web app with six Egyptian-themed games for practising attention, waiting, response inhibition, movement, and paced breathing. It uses a familiar mobile screen to guide play with a parent or educator. Play history stays in the current browser. The report separates sample data and compares the first three with the latest three real attempts within each game after six completed attempts; breathing completion is not a measure of emotional improvement. Shared play combines results in one history. Four crawlable Arabic parent guides cover anger, impulsivity, patience and focus. Built with React, TypeScript, Vite, and Tailwind CSS, with PWA support and regression tests.
 
 [Try the app](https://farkash.vercel.app) · [Report an issue](https://github.com/Omarhussien2/farkash/issues)

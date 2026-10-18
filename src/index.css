@@ -197,3 +197,54 @@ button, a { scroll-margin-block: 24px 120px; }
 
 .text-nile-400, .text-sand-400 { color: #526279; }
 .text-mango-600, .text-mango-700, .text-mango-800 { color: #975400; }
+
+.report-page > h1 { font-size: clamp(26px, 4vw, 36px); font-weight: 900; line-height: 1.6; }
+.report-intro, .report-section > p { color: var(--brand-muted); line-height: 1.9; margin: 8px 0 20px; }
+.report-demo { min-height: 44px; color: #096bb1; text-decoration: underline; font-size: 13px; font-weight: 700; }
+.report-notice { padding: 14px 18px; border-radius: 16px; background: #edf4f5; font-size: 13px; line-height: 1.9; margin: 8px 0 20px; }
+.report-metrics { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; margin-block: 20px; }
+.report-metric { padding: 18px; }
+.report-metric > span { color: #0879c9; display: block; margin-bottom: 12px; }
+.report-metric > strong { display: block; font-size: 30px; font-weight: 900; }
+.report-metric h2 { font-size: 13px; font-weight: 800; line-height: 1.8; }
+.report-metric p { font-size: 11px; color: var(--brand-muted); line-height: 1.8; margin-top: 5px; }
+.report-panel, .report-empty { padding: 24px; margin-bottom: 24px; border-radius: 24px; }
+.report-panel h2, .report-section > h2, .report-empty h2 { font-size: 21px; font-weight: 900; }
+.report-panel p, .report-empty p, .progress-game p { color: var(--brand-muted); line-height: 1.9; margin-block: 10px; font-size: 14px; }
+.report-empty .primary-cta, .next-step .primary-cta { margin-top: 14px; }
+.activity-week { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 6px; list-style: none; padding: 0; margin-top: 22px; text-align: center; }
+.activity-week span { display: grid; place-items: center; width: 42px; height: 42px; border-radius: 50%; background: #f0eee6; font-weight: 900; margin: 0 auto 8px; }
+.activity-week span.active { background: #dcefe8; color: #176849; }
+.activity-week small { font-size: 11px; }
+.progress-games { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; margin-bottom: 24px; }
+.progress-game { padding: 20px; display: flex; flex-direction: column; }
+.progress-game-top { display: flex; align-items: center; gap: 12px; }
+.progress-game h3 { font-weight: 900; font-size: 16px; }
+.progress-game small { color: var(--brand-muted); font-size: 11px; line-height: 1.9; }
+.progress-thumbnail { width: 54px; height: 64px; flex-shrink: 0; border-radius: 14px; overflow: hidden; background: #fff6df; }
+.progress-thumbnail .game-artwork { width: 100%; height: 100%; object-fit: cover; }
+.progress-change { font-size: 30px; font-weight: 900; color: #096bb1; margin-top: 18px; }
+.progress-context { padding: 12px; border-radius: 12px; background: #f3f5ef; }
+.score-comparison { margin-block: 4px 12px; }
+.score-comparison > div { display: flex; align-items: center; gap: 10px; font-size: 12px; margin-block: 8px; }
+.score-comparison span { min-width: 48px; }
+.score-comparison meter { flex: 1; width: 0; height: 14px; accent-color: #0879c9; }
+.score-comparison b { min-width: 22px; }
+.report-game-link { display: flex; align-items: center; justify-content: space-between; color: #096bb1; font-weight: 800; min-height: 44px; width: 100%; padding-top: 12px; margin-top: auto; }
+.next-step { background: #edf5ef; }
+.next-step ol { list-style: decimal; padding-inline-start: 22px; line-height: 2; font-size: 14px; }
+.report-method { border: 1px solid var(--brand-line); background: #fffefa; }
+.report-method summary { cursor: pointer; font-weight: 800; min-height: 44px; line-height: 1.9; }
+.parent-library-link { display: flex; gap: 14px; align-items: center; border: 1px solid #cddfe8; background: #edf5fa; border-radius: 20px; padding: 22px; margin-block: 24px; color: #096bb1; font-weight: 800; }
+.parent-library-link > span { flex: 1; }
+.parent-library-link small { display: block; font-size: 12px; line-height: 1.8; margin-top: 6px; font-weight: 600; color: var(--brand-muted); }
+@media (max-width: 600px) {
+  .report-metrics { gap: 8px; }
+  .report-metric { padding: 12px; }
+  .report-metric > strong { font-size: 26px; }
+  .report-metric h2 { font-size: 11px; }
+  .report-panel, .report-empty { padding: 18px; }
+  .progress-games { grid-template-columns: 1fr; }
+  .activity-week span { width: 32px; height: 32px; }
+  .activity-week small { font-size: 9px; }
+}

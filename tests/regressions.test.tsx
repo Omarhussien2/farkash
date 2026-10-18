@@ -74,7 +74,7 @@ describe('seven-day reporting', () => {
 
   it('shows no mastery or impulse-control claim without play history', () => {
     const stats = reportStats([], labels);
-    expect(stats.impulseControl).toBe(0);
+    expect(stats.avgScore).toBe(0);
     expect(stats.avgReaction).toBe(0);
     expect(stats.sessionsCount).toBe(0);
   });

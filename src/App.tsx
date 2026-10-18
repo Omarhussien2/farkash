@@ -28,8 +28,11 @@ const GAME_COMPONENTS: Record<GameId, LazyExoticComponent<ComponentType<{ onExit
 
 function Shell() {
   const { settings, setLang } = useApp();
-  const [tab, setTab] = useState<TabId>('games');
-  const [activeGame, setActiveGame] = useState<GameId | null>(null);
+  const [tab, setTab] = useState<TabId>(() => new URLSearchParams(window.location.search).get('view') === 'report' ? 'report' : 'games');
+  const [activeGame, setActiveGame] = useState<GameId | null>(() => {
+    const game = new URLSearchParams(window.location.search).get('game');
+    return game && Object.prototype.hasOwnProperty.call(GAME_COMPONENTS, game) ? game as GameId : null;
+  });
   const mainRef = useRef<HTMLElement>(null);
 
   useEffect(() => {
@@ -50,7 +53,7 @@ function Shell() {
     const Game = GAME_COMPONENTS[activeGame];
     screen = <Game key={activeGame} onExit={exitGame} />;
   } else if (tab === 'report') {
-    screen = <Report />;
+    screen = <Report onSelect={openGame} />;
   } else if (tab === 'settings') {
     screen = <Settings />;
   } else {

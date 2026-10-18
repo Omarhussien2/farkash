@@ -1,192 +1,74 @@
-import { useMemo } from 'react';
-import { motion } from 'framer-motion';
-import { TrendingUp, Clock, Heart, Zap, Trophy, Target, ShieldCheck } from 'lucide-react';
+import { useState } from 'react';
+import { CalendarDays, Heart, Target, Trophy, BookOpen, ArrowUpRight } from 'lucide-react';
 import { useApp } from '@/store/useApp';
-import { Card, ProgressBar } from '@/components/ui';
-import { t, tArr } from '@/utils/i18n';
-import { reportStats } from '@/utils/report';
-import { GAMES } from '@/types';
+import { Card } from '@/components/ui';
+import { GameArtwork } from '@/components/BrandArtwork';
+import { tArr } from '@/utils/i18n';
+import { gameProgress, reportStats } from '@/utils/report';
+import { GAMES, type GameId } from '@/types';
 
-export function Report() {
-  const { sessions, settings } = useApp();
-  const lang = settings.lang;
-  const dayLabels = useMemo(() => tArr(lang, 'day_labels'), [lang]);
+const practice: Record<GameId, [string, string]> = {
+  karasina: ['اتفقوا على إشارة الوقوف، وجربوا جولة من غير منافسة قبل اللعب.', 'Agree on the stop signal and try a round without competition.'],
+  tamathil: ['قلّدوا وضعية واحدة معًا، وامدح محاولة الثبات حتى لو كانت قصيرة.', 'Copy one pose together and praise the attempt to hold still.'],
+  ishara: ['راجعوا معنى كل إشارة، وابدأوا بتعليمات بسيطة قبل إضافة قاعدة جديدة.', 'Review each signal and practise a simple rule before adding another.'],
+  aks: ['قولوا القاعدة بصوت مسموع، وخلي الدقة أهم من سرعة الإجابة.', 'Say the rule aloud and focus on accuracy before speed.'],
+  sabr: ['شجّع الانتظار للإشارة الصحيحة، وسمّي السلوك: «استنيت قبل ما تضغط».', 'Praise waiting for the correct signal: “You waited before tapping.”'],
+  nafas: ['تنفّسوا براحة معًا وقت الهدوء، وتوقفوا لو التمرين غير مريح.', 'Breathe comfortably together during a calm moment; stop if uncomfortable.'],
+};
 
-  const stats = useMemo(() => reportStats(sessions, dayLabels), [sessions, dayLabels]);
+export function Report({ onSelect }: { onSelect: (game: GameId) => void }) {
+  const { sessions, settings: { lang } } = useApp();
+  const ar = lang === 'ar';
+  const [demo, setDemo] = useState(false);
+  const real = sessions.filter((session) => !session.id.startsWith('seed-'));
+  const samples = sessions.filter((session) => session.id.startsWith('seed-'));
+  const stats = reportStats(demo ? samples : real, tArr(lang, 'day_labels'));
+  const progress = gameProgress(real);
+  const played = progress.filter((item) => item.count > 0);
+  const comparable = played.filter((item) => item.scoreChange !== null);
+  const improved = comparable.filter((item) => item.scoreChange! > 0).length;
+  const latest = [...real].filter((item) => Date.parse(item.date) <= Date.now()).sort((a, b) => Date.parse(b.date) - Date.parse(a.date))[0];
+  const nextGame = latest?.game ?? 'sabr';
+  const days = stats.perDay.filter((day) => day.count > 0).length;
+  const date = (value: string) => new Date(value).toLocaleDateString(ar ? 'ar-EG' : 'en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
 
-  const maxDayScore = Math.max(1, ...stats.perDay.map((d) => d.score));
-  const maxReaction = Math.max(1, ...stats.perDay.map((d) => d.reaction || 1));
+  return <div className="content-page report-page">
+    <p className="eyebrow"><Trophy size={18} aria-hidden="true" />{ar ? 'كل محاولة تستحق التشجيع' : 'Every attempt deserves encouragement'}</p>
+    <h1>{ar ? 'خطوة بخطوة مع طفلك' : 'Growing together, step by step'}</h1>
+    <p className="report-intro">{ar ? 'تابع عادات اللعب، وافهم التغيّر في كل لعبة، واختاروا خطوة صغيرة للمرة الجاية.' : 'Follow play habits, understand changes within each game, and choose a small next step.'}</p>
+    {samples.length > 0 && <button className="report-demo" aria-pressed={demo} onClick={() => setDemo(!demo)}>{demo ? (ar ? 'عرض بيانات اللعب الحقيقي' : 'Show real play history') : (ar ? 'استكشاف نموذج تقرير تجريبي' : 'Explore a sample report')}</button>}
+    <div className="report-notice" role="status">{demo
+      ? (ar ? 'أنت تشاهد مثالًا توضيحيًا فقط. الأرقام التالية لا تخص طفلك، والمقارنات الشخصية مخفية.' : 'Sample report only. These numbers are not your child’s results; personal comparisons are hidden.')
+      : (ar ? 'بيانات اللعب الحقيقي فقط • آخر ٧ أيام حتى الآن • محفوظة على هذا الجهاز. السجل موحّد: مشاركة الجهاز أو اللعب الجماعي يدمج النتائج.' : 'Real play only • Last 7 calendar days through now • Saved on this device. Shared-device or group play combines results in one history.')}</div>
 
-  return (
-    <div className="content-page">
-      <div className="flex items-center gap-2 mb-1">
-        <Trophy className="w-7 h-7 text-mango-600" />
-        <h1 className="text-2xl font-black text-nile-800">{t(lang, 'report_title')}</h1>
-      </div>
-      <p className="text-sm font-semibold text-nile-500 mb-6">{t(lang, 'report_subtitle')}</p>
-      {sessions.some((session) => session.id.startsWith('seed-')) && <p className="rounded-2xl border border-mango-200 bg-mango-50 text-nile-900 p-4 mb-5 text-sm leading-relaxed">{lang === 'ar' ? 'التقرير فيه بيانات تجريبية للتوضيح، مع أي جلسات لعب جديدة. البيانات محفوظة على جهازك.' : 'This report includes sample history alongside any new play sessions. Your history is saved on this device.'}</p>}
-
-      {/* Stat cards */}
-      <div className="grid grid-cols-2 gap-3 mb-6">
-        <StatCard
-          icon={<Clock className="w-5 h-5" />}
-          color="nile"
-          label={t(lang, 'avg_reaction')}
-          value={`${stats.avgReaction}`}
-          unit={t(lang, 'ms_short')}
-        />
-        <StatCard
-          icon={<Heart className="w-5 h-5" />}
-          color="mint"
-          label={t(lang, 'total_patience')}
-          value={`${stats.totalPatience}`}
-          unit={t(lang, 'seconds_unit')}
-        />
-        <StatCard
-          icon={<Zap className="w-5 h-5" />}
-          color="clay"
-          label={t(lang, 'impulsive_errors')}
-          value={`${stats.totalErrors}`}
-        />
-        <StatCard
-          icon={<Target className="w-5 h-5" />}
-          color="mango"
-          label={t(lang, 'sessions_count')}
-          value={`${stats.sessionsCount}`}
-        />
-      </div>
-
-      {/* Impulse control + patience summary */}
-      <Card className="p-4 mb-4">
-        <div className="flex items-center gap-2 mb-3">
-          <ShieldCheck className="w-5 h-5 text-mint-600" />
-          <h3 className="font-black text-nile-800">{t(lang, 'impulse_control')}</h3>
-        </div>
-        <div className="flex items-center gap-4 mb-2">
-          <span className="text-4xl font-black text-mint-600">{stats.impulseControl}%</span>
-          <div className="flex-1">
-            <ProgressBar value={stats.impulseControl / 100} color="mint" />
-          </div>
-        </div>
-        <p className="text-xs font-semibold text-nile-400 mb-3">{t(lang, 'impulse_control_hint')}</p>
-        <div className="flex items-center gap-2">
-          <Heart className="w-4 h-4 text-clay-500" />
-          <span className="text-sm font-bold text-nile-600">{t(lang, 'total_patience')}:</span>
-          <span className="text-sm font-black text-nile-800">
-            {stats.totalPatience} {t(lang, 'seconds_unit')}
-          </span>
-        </div>
-      </Card>
-
-      {/* Daily score chart */}
-      <Card className="p-4 mb-4">
-        <div className="flex items-center gap-2 mb-3">
-          <TrendingUp className="w-5 h-5 text-nile-500" />
-          <h3 className="font-black text-nile-800">{t(lang, 'best_score')}</h3>
-        </div>
-        <div className="flex items-stretch justify-between gap-2 h-32">
-          {stats.perDay.map((d, i) => (
-            <div key={i} className="flex-1 flex flex-col items-center justify-end gap-1">
-              <motion.div
-                className="w-full bg-gradient-to-t from-nile-500 to-nile-300 rounded-t-lg"
-                initial={{ height: 0 }}
-                animate={{ height: `${(d.score / maxDayScore) * 70}%` }}
-                transition={{ delay: i * 0.06, type: 'spring', stiffness: 120 }}
-                style={{ minHeight: 4 }}
-              />
-              <span className="text-xs font-bold text-nile-600">{d.label}</span>
-              <span className="text-xs font-black text-nile-800">{d.score}</span>
-            </div>
-          ))}
-        </div>
-      </Card>
-
-      {/* Reaction time chart (lower is better) */}
-      <Card className="p-4 mb-4">
-        <div className="flex items-center gap-2 mb-3">
-          <Clock className="w-5 h-5 text-mint-600" />
-          <h3 className="font-black text-nile-800">{t(lang, 'avg_reaction')}</h3>
-        </div>
-        <div className="flex items-stretch justify-between gap-2 h-28">
-          {stats.perDay.map((d, i) => (
-            <div key={i} className="flex-1 flex flex-col items-center justify-end gap-1">
-              <motion.div
-                className="w-full bg-mint-500 rounded-t-lg"
-                initial={{ height: 0 }}
-                animate={{ height: d.count && d.reaction > 0 ? `${((maxReaction - d.reaction) / maxReaction) * 60 + 8}%` : '0%' }}
-                transition={{ delay: i * 0.06, type: 'spring', stiffness: 120 }}
-                style={{ minHeight: 4 }}
-              />
-              <span className="text-xs font-bold text-nile-600">{d.label}</span>
-            </div>
-          ))}
-        </div>
-        <p className="text-xs text-nile-400 font-semibold mt-2 text-center">
-          {lang === 'ar' ? 'كل ما القايمه طالت، سرعة استجابتك أحسن' : 'Taller bars = faster reaction'}
-        </p>
-      </Card>
-
-      {/* Per-game mastery */}
-      <Card className="p-4">
-        <div className="flex items-center gap-2 mb-3">
-          <Target className="w-5 h-5 text-berry-500" />
-          <h3 className="font-black text-nile-800">{t(lang, 'skill_mastery')}</h3>
-        </div>
-        <div className="space-y-2.5">
-          {stats.perGame.map((pg) => {
-            const meta = GAMES.find((g) => g.id === pg.game)!;
-            const name = lang === 'ar' ? meta.ar.name : meta.en.name;
-            return (
-              <div key={pg.game} className="flex items-center gap-3">
-                <span className="text-sm font-bold text-nile-700 w-28 truncate">{name}</span>
-                <div className="flex-1 h-3 rounded-full bg-sand-200 overflow-hidden">
-                  <motion.div
-                    className="h-full rounded-full bg-gradient-to-l from-berry-500 to-nile-500"
-                    initial={{ width: 0 }}
-                    animate={{ width: `${pg.avgScore}%` }}
-                    transition={{ type: 'spring', stiffness: 120 }}
-                  />
-                </div>
-                <span className="text-xs font-black text-nile-800 w-8 text-end">{pg.avgScore}</span>
-              </div>
-            );
-          })}
-        </div>
-      </Card>
+    {!demo && !played.length && <Card className="report-empty"><h2>{ar ? 'أول خطوة تبدأ بلعبة معًا' : 'Start with a game together'}</h2><p>{ar ? 'بعد إكمال أول لعبة، هتظهر المحاولة هنا. وللمقارنة داخل نفس اللعبة، نحتاج ٦ محاولات مكتملة على الأقل.' : 'Your first completed game will appear here. A within-game comparison needs at least 6 completed attempts.'}</p><button className="primary-cta" onClick={() => onSelect('sabr')}>{ar ? 'نجرب تحدي الصبر' : 'Try Patience & Color'}</button></Card>}
+    <div className="report-metrics">
+      <Metric icon={<Target />} value={stats.sessionsCount} title={ar ? 'محاولات مكتملة' : 'Completed attempts'} hint={ar ? 'خلال آخر ٧ أيام' : 'In the last 7 days'} />
+      <Metric icon={<CalendarDays />} value={`${days}/7`} title={ar ? 'أيام لعب' : 'Days played'} hint={ar ? 'الاستمرارية أهم من كثرة الجولات' : 'Consistency over extra rounds'} />
+      <Metric icon={<Heart />} value={stats.totalPatience} title={ar ? 'ثوانٍ مسجّلة للانتظار والهدوء' : 'Recorded waiting & calm seconds'} hint={ar ? 'وقت داخل الألعاب، وليس قياسًا للصبر اليومي' : 'In-game time, not everyday patience'} />
     </div>
-  );
+    <Card className="report-panel"><h2>{ar ? 'إيقاع اللعب خلال الأسبوع' : 'Your weekly play rhythm'}</h2><p>{ar ? 'كل دائرة تمثل يومًا؛ الرقم هو عدد المحاولات المكتملة. اليوم الخالي فرصة للراحة.' : 'Each circle is a day; the number is completed attempts. A quiet day can be a rest day.'}</p><ol className="activity-week">{stats.perDay.map((day, index) => <li key={index}><span className={day.count ? 'active' : ''}>{day.count}</span><small>{day.label}</small></li>)}</ol></Card>
+    {!demo && <><section className="report-section" aria-labelledby="progress-heading"><h2 id="progress-heading">{ar ? 'هل الأداء بيتغيّر؟' : 'How is play performance changing?'}</h2><p>{comparable.length ? (ar ? `تحسّن متوسط نتيجة ${improved} من ${comparable.length} ألعاب قابلة للمقارنة. ` : `${improved} of ${comparable.length} comparable games have higher scores. `) : (ar ? 'لسه بنكوّن صورة عن محاولات اللعب. ' : 'We are still building a picture of play attempts. ')}{ar ? 'نقارن أول ٣ محاولات بآخر ٣ في نفس اللعبة بعد اكتمال ٦، عبر السجل الحقيقي كله، وليس الأسبوع فقط.' : 'After 6 attempts, we compare the first 3 with the latest 3 in the same game across all real history, not just this week.'}</p>
+      <div className="progress-games">{GAMES.map((meta) => {
+        const item = progress.find((entry) => entry.game === meta.id)!;
+        return <Card key={meta.id} className="progress-game"><div className="progress-game-top"><div className="progress-thumbnail"><GameArtwork game={meta.id} /></div><div><h3>{meta[lang].name}</h3><small>{item.count} {ar ? 'محاولات في السجل' : 'recorded attempts'}</small></div></div>
+          {item.scoreChange === null ? <p>{meta.id === 'nafas' ? (ar ? 'نسجّل إكمال تمرين التنفس؛ درجة إكماله لا تقيس هدوء الطفل أو حالته النفسية.' : 'We record breathing exercise completion; its score does not measure calm or mental health.') : (ar ? `نحتاج ${Math.max(0, 6 - item.count)} محاولات إضافية لعرض مقارنة أولية.` : `${Math.max(0, 6 - item.count)} more attempts needed for an initial comparison.`)}</p> : <>
+            <strong className="progress-change">{item.scoreChange > 0 ? '+' : ''}{item.scoreChange} {ar ? 'نقطة' : 'points'}</strong><p>{ar ? 'التغيّر في متوسط النتيجة من ١٠٠' : 'Change in average score out of 100'}</p>
+            <div className="score-comparison">{[[ar ? 'أول ٣' : 'First 3', item.baselineScore], [ar ? 'آخر ٣' : 'Latest 3', item.recentScore]].map(([label, value]) => <div key={label}><span>{label}</span><meter min="0" max="100" value={Number(value)} aria-label={String(label)} /><b>{value}</b></div>)}</div>
+            <p>{ar ? `تغيّر متوسط الأخطاء لكل محاولة: ${item.errorChange! > 0 ? '+' : ''}${item.errorChange}. الأقل يعني أخطاء مسجّلة أقل.` : `Change in average errors per attempt: ${item.errorChange! > 0 ? '+' : ''}${item.errorChange}. Lower means fewer recorded errors.`}</p>
+            <p className="progress-context">{item.scoreChange > 0 ? (ar ? 'اتجاه مشجّع داخل اللعبة. لاحظ كمان هل المهارة بتظهر خارجها.' : 'An encouraging in-game trend. Also look for the skill outside the game.') : item.scoreChange < 0 ? (ar ? 'النتيجة أقل حاليًا. جرّب راحة، وراجع القاعدة معه قبل المحاولة التالية.' : 'Scores are lower for now. Try a break and review the rule together.') : (ar ? 'الأداء متقارب. كرّروا بهدوء من غير ضغط لرفع النتيجة.' : 'Scores are similar. Keep practice relaxed, without pressure.')}</p>
+          </>}
+          {item.firstDate && item.lastDate && <small>{date(item.firstDate)} — {date(item.lastDate)}</small>}
+          <button className="report-game-link" onClick={() => onSelect(meta.id)}>{ar ? 'نتمرّن معًا' : 'Practise together'}<ArrowUpRight size={16} aria-hidden="true" /></button>
+        </Card>;
+      })}</div></section>
+      <Card className="report-panel next-step"><span className="eyebrow">{ar ? 'خطوتكم القادمة' : 'Your next step'}</span><h2>{GAMES.find((game) => game.id === nextGame)![lang].name}</h2><p>{practice[nextGame][ar ? 0 : 1]}</p><ol><li>{ar ? 'قبل اللعب: اختاروا قاعدة واحدة ومكانًا مريحًا.' : 'Before play: choose one rule and a comfortable space.'}</li><li>{ar ? 'أثناء اللعب: امدح المحاولة المحددة، وخدوا راحة عند التعب.' : 'During play: praise a specific effort and rest when tired.'}</li><li>{ar ? 'بعد اللعب: لاحظ هل انتظر دوره أو اتبع تعليمات مشابهة بعيدًا عن الشاشة.' : 'After play: notice turn-taking or following similar instructions away from the screen.'}</li></ol><button className="primary-cta" onClick={() => onSelect(nextGame)}>{ar ? 'ابدأوا المحاولة' : 'Start an attempt'}</button></Card>
+    </>}
+    <details className="report-panel report-method"><summary>{ar ? 'إزاي أقرأ التقرير بشكل صحيح؟' : 'How should I read this report?'}</summary><p>{ar ? 'المقارنات وصف لمحاولات اللعب وليست اختبارًا للنمو أو تشخيصًا. النوم والمساعدة وتغيير إعدادات اللعبة ممكن يؤثروا على النتيجة. استخدموا ظروفًا متقاربة، واهتموا بالدقة والمحاولة بدل السرعة وحدها.' : 'Comparisons describe play attempts, not development tests or diagnoses. Sleep, assistance and settings can affect scores. Keep conditions similar and value accuracy and effort over speed alone.'}</p><p>{ar ? 'ألعاب الحركة تعتمد على تأكيد اللاعب أو ولي الأمر؛ التطبيق لا يراقب الحركة بالكاميرا. لا توجد ملفات منفصلة للأطفال: اللعب الجماعي أو مشاركة الجهاز يدمج النتائج، لذلك لا يمكن نسبتها لطفل واحد.' : 'Movement games rely on player or adult confirmation, not camera tracking. There are no separate child profiles: shared-device or group play combines results, so they cannot be attributed to one child.'}</p><p>{ar ? 'المقارنة تبدأ بعد ٦ محاولات لتكوين مجموعتين من ٣؛ هذا شرط حسابي داخل التطبيق، وليس معيارًا طبيًا. تقرير الأسبوع يحسب الأيام بالتوقيت المحلي للجهاز.' : 'Six attempts provide two sets of three; this is an app calculation rule, not a clinical benchmark. Weekly dates follow the device’s local time.'}</p></details>
+    <a className="parent-library-link" href="/articles/"><BookOpen aria-hidden="true" /><span>{ar ? 'مكتبة أولياء الأمور' : 'Parent reading library'}<small>{ar ? 'أفكار للعب والتهدئة وتشجيع المحاولة' : 'Ideas for play, calm and encouragement · Arabic articles'}</small></span><ArrowUpRight aria-hidden="true" /></a>
+  </div>;
 }
 
-function StatCard({
-  icon,
-  label,
-  value,
-  unit,
-  color,
-}: {
-  icon: React.ReactNode;
-  label: string;
-  value: string;
-  unit?: string;
-  color: 'nile' | 'mango' | 'clay' | 'mint' | 'berry';
-}) {
-  const colors: Record<string, string> = {
-    nile: 'bg-nile-100 text-nile-700',
-    mango: 'bg-mango-100 text-mango-800',
-    clay: 'bg-clay-100 text-clay-700',
-    mint: 'bg-mint-500/15 text-mint-600',
-    berry: 'bg-berry-500/15 text-berry-500',
-  };
-  return (
-    <Card className="p-3">
-      <div className={`w-9 h-9 rounded-xl flex items-center justify-center mb-2 ${colors[color]}`}>
-        {icon}
-      </div>
-      <p className="text-xs font-bold text-nile-500 leading-tight mb-1">{label}</p>
-      <div className="flex items-baseline gap-1">
-        <span className="text-2xl font-black text-nile-800">{value}</span>
-        {unit && <span className="text-xs font-bold text-nile-400">{unit}</span>}
-      </div>
-    </Card>
-  );
+function Metric({ icon, value, title, hint }: { icon: React.ReactNode; value: number | string; title: string; hint: string }) {
+  return <Card className="report-metric"><span aria-hidden="true">{icon}</span><strong>{value}</strong><h2>{title}</h2><p>{hint}</p></Card>;
 }

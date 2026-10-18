@@ -5,6 +5,27 @@ function averageReaction(sessions: GameSession[]) {
   return timed.length ? Math.round(timed.reduce((sum, session) => sum + session.reactionMs, 0) / timed.length) : 0;
 }
 
+/** Compare equal, non-overlapping sets within one game, never across games. */
+export function gameProgress(sessions: GameSession[], now = new Date()) {
+  return GAMES.map((game) => {
+    const history = sessions.filter((session) => !session.id.startsWith('seed-') && session.game === game.id && new Date(session.date).getTime() <= now.getTime())
+      .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+    const recent = history.slice(-3);
+    const baseline = history.slice(0, 3);
+    const mean = (items: GameSession[], field: 'score' | 'impulsiveErrors') => items.reduce((sum, item) => sum + item[field], 0) / items.length;
+    const comparable = history.length >= 6 && game.id !== 'nafas';
+    return {
+      game: game.id, count: history.length,
+      recentScore: recent.length ? Math.round(mean(recent, 'score')) : null,
+      baselineScore: comparable ? Math.round(mean(baseline, 'score')) : null,
+      scoreChange: comparable ? Math.round(mean(recent, 'score') - mean(baseline, 'score')) : null,
+      errorChange: comparable ? Math.round((mean(recent, 'impulsiveErrors') - mean(baseline, 'impulsiveErrors')) * 10) / 10 : null,
+      firstDate: history[0]?.date,
+      lastDate: history[history.length - 1]?.date,
+    };
+  });
+}
+
 export function reportStats(sessions: GameSession[], dayLabels: string[], now = new Date()) {
   const last7 = sessions.filter((s) => {
     const days = (now.getTime() - new Date(s.date).getTime()) / 86400000;
@@ -51,19 +72,12 @@ export function reportStats(sessions: GameSession[], dayLabels: string[], now = 
     };
   });
 
-  // Impulse control %: starts at 100, each error-per-session average costs 20 points.
-  const impulseControl = last7.length === 0 ? 0 : Math.max(
-    0,
-    Math.min(100, Math.round(100 - (totalErrors / Math.max(1, last7.length)) * 20))
-  );
-
   return {
     last7,
     avgReaction,
     totalPatience: Math.round(totalPatience),
     totalErrors,
     avgScore,
-    impulseControl,
     perDay,
     perGame,
     sessionsCount: last7.length,

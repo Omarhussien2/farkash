@@ -27,3 +27,6 @@ dist-ssr
 .qoder-shots/
 
 .vercel
+/public/articles/
+/public/sitemap.xml
+/public/robots.txt

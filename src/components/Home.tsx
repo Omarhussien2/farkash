@@ -52,6 +52,7 @@ export function Home({ lang, onSelect, onQuickDemo }: Props) {
         <p className="sr-only" role="status">{ar ? `${games.length} ألعاب` : `${games.length} ${games.length === 1 ? 'game' : 'games'}`}</p>
         <div className="game-grid">{games.map((game) => <GameCard key={game.id} game={game} lang={lang} onSelect={() => onSelect(game.id)} />)}</div>
       </section>
+      <a className="parent-library-link" href="/articles/"><BrandSticker icon="rainbow" /><span>{ar ? 'لوليّ الأمر: نفهم السلوك ونلعب معًا' : 'For parents: understand behaviour and play together'}<small>{ar ? '٤ أدلة عملية عن العصبية والاندفاع والانتظار والتركيز، مع أسئلة شائعة ومصادر للقراءة.' : 'Four practical Arabic guides about anger, impulsivity, waiting and focus, with FAQs and sources.'}</small></span><ArrowUpRight aria-hidden="true" /></a>
       <footer className="home-footer"><BrandSticker icon="ticket" /><p>{ar ? 'صُنع بحب، للّحظات اللي بتفرق.' : 'Made with care, for the moments that matter.'}</p><span>فركش · Farkash</span></footer>
     </div>
   );
