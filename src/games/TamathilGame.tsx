@@ -16,7 +16,7 @@ import {
   playDing,
 } from '@/utils/egyptianAudioEngine';
 import { speak } from '@/utils/speech';
-import { HeronPose, NileBoatPose } from '@/components/Illustrations';
+
 import { POSE_ARTWORK } from '@/brand';
 
 interface Props {
@@ -53,7 +53,7 @@ const POSES: Pose[] = [
     arName: 'اقف على رجل واحدة زي مالك الحزين',
     enName: 'Stand on one leg like the heron',
     color: '#1E88E5',
-    artwork: <HeronPose className="pose-artwork" />,
+            artwork: <img src={POSE_ARTWORK.flamingo} alt="" width="1122" height="1402" className="pose-artwork" decoding="async" />,
   },
   {
     key: 'ramses',
@@ -67,7 +67,7 @@ const POSES: Pose[] = [
     arName: 'اثبت زي المركب في النيل',
     enName: 'Freeze like a Nile boat',
     color: '#26A69A',
-    artwork: <NileBoatPose className="pose-artwork" />,
+            artwork: <img src={POSE_ARTWORK.boat} alt="" width="1122" height="1402" className="pose-artwork" decoding="async" />,
   },
 ];
 
